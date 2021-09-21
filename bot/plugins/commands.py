@@ -4,14 +4,38 @@
 
 from pyrogram import filters, Client
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, CallbackQuery
-from bot import Translation, LOGGER # pylint: disable=import-error
+from bot import Translation # pylint: disable=import-error
 from bot.database import Database # pylint: disable=import-error
+from pyrogram.errors import UserNotParticipant
+from bot import FORCESUB_CHANNEL
 
 db = Database()
 
-@Client.on_message(filters.command(["start"]) & filters.private, group=1)
-async def start(bot, update):
-    
+@Client.on_message(filters.command(["start"]) & filters.private, group=1) 
+async def start(bot, update): 
+    update_channel = FORCESUB_CHANNEL 
+    if update_channel: 
+        try: 
+            user = await bot.get_chat_member(update_channel, update.chat.id) 
+            if user.status == "kicked": 
+               await update.reply_text("🤭 Sorry Dude, You are B A N N E D 🤣🤣🤣") 
+               return 
+        except UserNotParticipant: 
+            #await update.reply_text(f"Join @{update_channel} To Use Me") 
+            await update.reply_text( 
+                text=""" <b> 🔊 𝗝𝗼𝗶𝗻 𝗢𝘂𝗿 𝗠𝗮𝗶𝗻 𝗰𝗵𝗮𝗻𝗻𝗲𝗹 🤭. 
+Do you want Movies? If u want Movies Join our main Channel.❤️ 
+Then go to the Group and click movie button, You Will get ..!😁 
+ 
+⚠️YOU ARE NOT SUBSCRIBED OUR CHANNEL⚠️ 
+ 
+Join on our channel to get movies ✅ 
+⬇️Channel link⬇️ </b>""", 
+                reply_markup=InlineKeyboardMarkup([ 
+                    [ InlineKeyboardButton(text="⚡ Join My Channel⚡️", url=f"https://t.me/{update_channel}")] 
+              ]) 
+            ) 
+            return
     try:
         file_uid = update.command[1]
     except IndexError:
@@ -24,37 +48,131 @@ async def start(bot, update):
             return
         
         caption = file_caption if file_caption != ("" or None) else ("<code>" + file_name + "</code>")
-        try:
-            await update.reply_cached_media(
-                file_id,
-                quote=True,
-                caption = caption,
+        
+        if file_type == "document":
+        
+            await bot.send_document(
+                chat_id=update.chat.id,
+                document = file_id,
+                caption = f"<code>{file_name}</code>\n \n<b>➖ @Popcorn_group ➖</b>",                
+                parse_mode="html",
+                reply_to_message_id=update.message_id,
+                reply_markup=InlineKeyboardMarkup(
+                    [
+                        [
+                            InlineKeyboardButton
+                                (
+                                    '🎸 𝙹𝚘𝚒𝚗 𝙾𝚞𝚛 𝙶𝚛𝚘𝚞𝚙 🎸' , url="https://t.me/Popcorn_group"
+                                )
+                        ],
+                        [
+                            InlineKeyboardButton
+                                (
+                                    '🧩 𝚂𝚑𝚊𝚛𝚎 𝙶𝚛𝚘𝚞𝚙 🧩 ', url="https://t.me/share/url?url=https://t.me/Popcorn_group"
+                                )
+                        ],
+                        [
+
+                            InlineKeyboardButton
+
+                                (
+
+                                    '💋 𝙽𝚎𝚠 𝙼𝚘𝚟𝚒𝚎𝚜 💋', url="https://t.me/keralamoviesindian"
+
+                                )
+
+                        ]
+                       
+                    ]
+                )
+            )
+
+        elif file_type == "video":
+        
+            await bot.send_video(
+                chat_id=update.chat.id,
+                video = file_id,
+                caption = f"<code>{file_name}</code>\n \n<b>➖ @Popcorn_group ➖</b>",                 
                 parse_mode="html",
                 reply_markup=InlineKeyboardMarkup(
                     [
                         [
                             InlineKeyboardButton
                                 (
-                                    'Developers', url="https://t.me/CrazyBotsz"
+                                    '🎸 𝙹𝚘𝚒𝚗 𝙾𝚞𝚛 𝙶𝚛𝚘𝚞𝚙 🎸', url="@Popcorn_group")
+                        ],
+                        [
+                            InlineKeyboardButton
+                                (
+                                    '🧩 𝚂𝚑𝚊𝚛𝚎 𝙶𝚛𝚘𝚞𝚙 🧩 ', url="https://t.me/share/url?url=https://t.me/Popcorn_group"
                                 )
+                        ],
+                        [
+
+                            InlineKeyboardButton
+
+                                (
+
+                                    '💋 𝙽𝚎𝚠 𝙼𝚘𝚟𝚒𝚎𝚜 💋', url="https://t.me/keralamoviesindian"
+
+                                )
+
                         ]
                     ]
                 )
             )
-        except Exception as e:
-            await update.reply_text(f"<b>Error:</b>\n<code>{e}</code>", True, parse_mode="html")
-            LOGGER(__name__).error(e)
+            
+        elif file_type == "audio":
+        
+            await bot.send_audio(
+                chat_id=update.chat.id,
+                audio = file_id,
+                caption = f"<code>{file_name}</code>\n \n<b>➖ @Popcorn_group ➖</b>",                
+                parse_mode="html",
+                reply_markup=InlineKeyboardMarkup(
+                    [
+                        [
+                            InlineKeyboardButton
+                                (
+                                    '🎸 𝙹𝚘𝚒𝚗 𝙾𝚞𝚛 𝙶𝚛𝚘𝚞𝚙 🎸', url="https://t.me/Popcorn_group"
+                                )
+                        ],
+                        [
+                            InlineKeyboardButton
+                                (
+                                    '🧩 𝚂𝚑𝚊𝚛𝚎 𝙶𝚛𝚘𝚞𝚙 🧩 ', url="https://t.me/share/url?url=https://t.me/Popcorn_group"
+                                )
+                        ],
+                        [
+
+                            InlineKeyboardButton
+
+                                (
+
+                                    '💋 𝙽𝚎𝚠 𝙼𝚘𝚟𝚒𝚎𝚜 💋', url="https://t.me/keralamoviesindian"
+
+                                )
+
+                        ]
+                    ]
+                )
+            )
+
+        else:
+            print(file_type)
+        
         return
 
     buttons = [[
-        InlineKeyboardButton('Developers', url='https://t.me/CrazyBotsz'),
-        InlineKeyboardButton('Source Code 🧾', url ='https://github.com/CrazyBotsz/Adv-Auto-Filter-Bot-V2')
+        InlineKeyboardButton('🎯𝘎𝘳𝘰𝘶𝘱🎯', url='https://t.me/Popcorn_group'),
+        InlineKeyboardButton('🎯𝘊𝘩𝘢𝘯𝘯𝘦𝘭🎯', url ='https://t.me/malayalammoviesindian')
     ],[
-        InlineKeyboardButton('Support 🛠', url='https://t.me/CrazyBotszGrp')
+        InlineKeyboardButton('🎯𝘊𝘩𝘢𝘯𝘯𝘦𝘭²🎯', url='https://t.me/Animated_Popcorn')
     ],[
-        InlineKeyboardButton('Help ⚙', callback_data="help")
+        InlineKeyboardButton('🎯𝘔𝘺 𝘋𝘦𝘷𝘦𝘭𝘰𝘱𝘦𝘳🎯', url='https://t.me/Lucifer_Devil_AD' )
+    ],[
+        InlineKeyboardButton('Help ⚙', callback_data="help")   
     ]]
-    
     reply_markup = InlineKeyboardMarkup(buttons)
     
     await bot.send_message(
